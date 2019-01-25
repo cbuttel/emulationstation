@@ -220,7 +220,7 @@ void ViewController::launch(FileData* game, Vector3f center)
 	mLockInput = true;
 
 	std::string transition_style = Settings::getInstance()->getString("TransitionStyle");
-	if(transition_style == "fade")
+	if(transition_style == "fade" || transition_style == "slide")
 	{
 		// fade out, launch game, fade back in
 		auto fadeFunc = [this](float t) {
@@ -230,15 +230,6 @@ void ViewController::launch(FileData* game, Vector3f center)
 		{
 			game->launchGame(mWindow);
 			setAnimation(new LambdaAnimation(fadeFunc, 800), 0, [this] { mLockInput = false; }, true);
-			this->onFileChanged(game, FILE_METADATA_CHANGED);
-		});
-	} else if (transition_style == "slide"){
-		// move camera to zoom in on center + fade out, launch game, come back in
-		setAnimation(new LaunchAnimation(mCamera, mFadeOpacity, center, 1500), 0, [this, origCamera, center, game]
-		{
-			game->launchGame(mWindow);
-			mCamera = origCamera;
-			setAnimation(new LaunchAnimation(mCamera, mFadeOpacity, center, 600), 0, [this] { mLockInput = false; }, true);
 			this->onFileChanged(game, FILE_METADATA_CHANGED);
 		});
 	} else { // instant
